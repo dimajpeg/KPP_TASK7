@@ -1,0 +1,70 @@
+doctype html
+html
+    head
+        title Library Books
+        link(rel="stylesheet", href="/styles.css")
+    body
+        h1 Library Books
+        a(href='/add') Add New Book
+
+        // Форма для фильтрации книг
+        form#filterForm
+            select(name="filter")
+                option(value="all") All Books
+                option(value="available") Available
+                option(value="overdue") Overdue
+            button(type="submit") Apply Filter
+
+        table
+            thead
+                tr
+                    th Title
+                    th Author
+                    th Available
+                    th Actions
+            tbody#bookList
+                each book in library
+                    tr
+                        td= book.title
+                        td= book.author
+                        td= book.available ? 'Yes' : 'No'
+                        td
+                            a(href='/book/' + book.id) Edit
+                            form(action='/book/' + book.id, method='POST')
+                                button(type='submit') Borrow/Return
+                            form(action='/book/' + book.id, method='POST', class='delete')
+                                button(type='submit') Delete
+
+        // Скрипт для отправки AJAX-запроса и обновления списка книг
+        script.
+            document.getElementById('filterForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const filter = document.querySelector('select[name="filter"]').value;
+
+                fetch(`/books?filter=${filter}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const bookList = document.getElementById('bookList');
+                        bookList.innerHTML = ''; // Очистка текущего списка
+
+                        data.forEach(book => {
+                            const bookElement = document.createElement('tr');
+                            bookElement.innerHTML = `
+                                <td>${book.title}</td>
+                                <td>${book.author}</td>
+                                <td>${book.available ? 'Yes' : 'No'}</td>
+                                <td>
+                                    <a href='/book/${book.id}'>Edit</a>
+                                    <form action='/book/${book.id}' method='POST'>
+                                        <button type='submit'>Borrow/Return</button>
+                                    </form>
+                                    <form action='/book/${book.id}' method='POST' class='delete'>
+                                        <button type='submit'>Delete</button>
+                                    </form>
+                                </td>
+                            `;
+                            bookList.appendChild(bookElement);
+                        });
+                    });
+            });

@@ -1,0 +1,19 @@
+doctype html
+html
+    head
+        title Edit Book
+        link(rel="stylesheet", href="/styles.css")
+    body
+        h1 Edit Book Details
+        form(action='/book/' + book.id, method='POST')
+            div
+                label(for='title') Title:
+                input(type='text', name='title', id='title', value=book.title)
+            div
+                label(for='author') Author:
+                input(type='text', name='author', id='author', value=book.author)
+            div
+                label(for='dueDate') Due Date:
+                input(type='date', name='dueDate', id='dueDate', value=book.dueDate || '')
+            div
+                button(type='submit') Save Changes
